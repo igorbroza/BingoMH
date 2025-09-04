@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Interativo - Versão Completa</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        #main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 700px;
+        }
+        #question-container {
+            background-color: #fff;
+            border: 2px solid #4682b4;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        #question-display, #answer-display {
+            font-size: 1.2em;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        #answer-display {
+            color: #2e8b57;
+            font-weight: bold;
+        }
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background-color: #5a9bd4;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #4682b4;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #board-container {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #bingo-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            background-color: #e6e6fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .board-number {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .drawn {
+            background-color: #ffd700;
+            color: #333;
+            cursor: pointer;
+            border: 2px solid #b8860b;
+        }
+        .drawn:hover {
+            opacity: 0.8;
+        }
+        .disabled {
+            background-color: #f2f2f2;
+            color: #aaa;
+        }
+        h1, h2 {
+            color: #4682b4;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <h1>Bingo de Perguntas</h1>
+        <div class="buttons">
+            <button id="draw-btn">Sortear Questão</button>
+            <button id="answer-btn" disabled>Mostrar Resposta</button>
+        </div>
+        <div id="question-container">
+            <div id="question-display">Clique em "Sortear Questão" para começar!</div>
+            <div id="answer-display" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div id="board-container">
+        <h2>Números Sorteados</h2>
+        <div id="bingo-board"></div>
+    </div>
+
+    <script>
+        const bingoData = [
+            // Novas questões do arquivo SAEB QUESTÕES DO BINGO.pdf
+            { number: 0, question: "Qual o resultado da expressão? <br> $$(x+\\sqrt{81}+5^{2})^{0}-1$$", answer: "R: 0 (Qualquer número elevado a zero é 1. Então, 1 - 1 = 0)" },
+            { number: 1, question: "Dado o número racional 2,981, qual algarismo está na casa do milésimo?", answer: "R: 1" },
+            { number: 2, question: "Qual o resultado da expressão? <br> $$\\frac{(\\frac{1}{2})^{-3}}{4}$$", answer: "R: 2 (O expoente negativo inverte a fração, então (2/1)³ = 8. E 8 / 4 = 2)" },
+            { number: 3, question: "Qual o resultado da expressão? <br> $$1,25+0,5+\\frac{5}{4}$$", answer: "R: 3 (Como 5/4 é igual a 1,25, a soma é 1,25 + 0,5 + 1,25 = 3)" },
+            { number: 4, question: "Qual o resultado da expressão? <br> $$3,456+0,544$$", answer: "R: 4" },
+            { number: 5, question: "500 centímetros equivalem a quantos metros?", answer: "R: 5 metros (1 metro = 100 centímetros)" },
+            { number: 6, question: "Qual o valor de x na expressão? <br> $$\\frac{x}{3}=\\frac{18}{9}$$", answer: "R: 6 (Como 18/9 = 2, temos x/3 = 2. Portanto, x = 6)" },
+            { number: 7, question: "Pela manhã, a temperatura na cidade de Saeblândia era de -5°C. No início da tarde, houve um aumento de 12°C. Qual foi a temperatura da cidade após essa elevação?", answer: "R: 7°C" },
+            { number: 8, question: "Qual a área do triângulo a seguir? <br> (<b>Imagem:</b> um triângulo retângulo com base medindo 4 cm e altura medindo 4 cm)", answer: "R: 8 cm² (Área = (base x altura) / 2)" },
+            
+            // Questões do Documento sem título.pdf
+            { number: 10, question: "Uma caixa mede 2 m de comprimento, 5m de largura e 1 m de altura. Qual é o volume dessa caixa?", answer: "R: 10 metros cúbicos" },
+            { number: 11, question: "Qual o PERÍMETRO de um quadrilátero que tem como medidas 5cm, 2cm, 3cm e 1 cm?", answer: "R: 11 cm" },
+            { number: 12, question: "Um aquário mede 2 cm de comprimento, 2cm de largura e 3 cm de altura. Qual é o volume do aquário em cm³?", answer: "R: 12 centímetros cúbicos" },
+            { number: 13, question: "Qual o valor APROXIMADO da raiz quadrada de 170?", answer: "R: 13 (Pois 13² = 169)" },
+            { number: 14, question: "Um retângulo mede 7 m de comprimento e 2 m de largura. Qual é a área desse retângulo?", answer: "R: 14 m²" },
+            { number: 15, question: "Um triângulo equilátero tem cada lado medindo 5 cm. Qual é o perímetro desse triângulo?", answer: "R: 15 cm" },
+            { number: 16, question: "Um triângulo tem base de 8 m e altura de 4 m. Qual é a área dele? (Lembre: Área = base x altura / 2)", answer: "R: 16 m²" },
+            { number: 17, question: "Um número foi multiplicado por 3 e, em seguida, subtraído de 10. O resultado foi 41. Qual é esse número?", answer: "R: 17" },
+            { number: 18, question: "Uma turma de 40 alunos fez uma prova. Se 45% acertaram todas as questões, quantos alunos foram?", answer: "R: 18 alunos" },
+            { number: 19, question: "Um celular custa 380 reais. Ao ser dividido em 20 parcelas iguais, qual é o valor de cada parcela?", answer: "R: 19 reais" },
+            { number: 20, question: "Qual a raiz quadrada de 400?", answer: "R: 20" },
+            { number: 21, question: "Um tanque estava cheio com 84 litros de água. Após gastar 3/4 desse total, quantos litros ainda restaram?", answer: "R: 21 litros (gastou 63L, restou 21L)" },
+            { number: 22, question: "Uma sala de aula tem 66 carteiras que precisam ser organizadas em 3 fileiras iguais. Quantas carteiras ficarão em cada fileira?", answer: "R: 22 carteiras" },
+            { number: 23, question: "Em uma escola, os 69 alunos do 9º ano foram divididos igualmente em 3 turmas. Quantos alunos ficaram em cada turma?", answer: "R: 23 alunos" },
+            { number: 24, question: "Um produto custa 30 reais e recebe um desconto de 20%. Qual é o valor a pagar?", answer: "R: 24 reais" },
+
+            // Questões do QUESTÕES PARA BINGO (1).pdf
+            { number: 25, question: "<b>Texto:</b> 'Diego não conhecia o mar... E foi tanta a imensidão do mar, e tanto fulgor, que o menino ficou mudo de beleza. E quando finalmente conseguiu falar, tremendo, gaguejando, pediu ao pai: Me ajuda a olhar!'<br><br><b>Pergunta:</b> O menino ficou tremendo, gaguejando por quê?", answer: "R: O mar era imenso e belo." },
+            { number: 26, question: "<b>Texto:</b> '...um mar sombrio, cheio de peixosos peixes queixosos e pesarosos, tão horríveis de se comer que faziam as pessoas arrotarem de pura melancolia...'<br><br><b>Pergunta:</b> O trecho do texto que indica uma consequência é:", answer: "R: '...que faziam as pessoas arrotarem de pura melancolia'." },
+            { number: 27, question: "<b>Texto:</b> 'O galo e as galinhas viram de longe uma raposa que chegava. Empoleiraram-se na árvore mais próxima para escapar da inimiga.'<br><br><b>Pergunta:</b> O galo e as galinhas subiram na árvore por quê?", answer: "R: Queriam escapar da raposa." },
+            { number: 28, question: "<b>Frase:</b> 'Ela explica que às vezes pedaços de carne são lançados na água para atrair os tigres, <b>mas normalmente eles não precisam de nenhum incentivo.</b>'<br><br><b>Pergunta:</b> A oração em destaque estabelece em relação à oração anterior uma ideia de:", answer: "R: Oposição." },
+            { number: 29, question: "<b>Texto:</b> 'Remédios para emagrecer devem ser evitados por quem corre. O motivo: normalmente, eles contêm estimulantes que aumentam a frequência cardíaca e aceleram o metabolismo...'<br><br><b>Pergunta:</b> Esse texto tem o objetivo de:", answer: "R: Dar uma orientação." },
+            { number: 30, question: "<b>Texto:</b> 'O índice pluviométrico refere-se à quantidade de chuva por metro quadrado em determinado local... Para chegar a esse índice... utilizam um aparelho conhecido como pluviômetro.'<br><br><b>Pergunta:</b> A finalidade desse texto é:", answer: "R: Informar." },
+            { number: 31, question: "<b>Texto:</b> 'A tecnologia brasileira está ajudando a população de Angola a identificar e desarmar milhares de minas terrestres... Uma empresa... vem dando treinamento aos angolanos para a identificação de minas por meio de imagens de satélite.'<br><br><b>Pergunta:</b> De acordo com esse texto, qual a finalidade da tecnologia brasileira em Angola?", answer: "R: Identificar minas terrestres." },
+            { number: 32, question: "<b>Pergunta:</b> Qual trecho exemplifica o uso da linguagem informal, enfatizando a intimidade entre os interlocutores?", answer: "R: '...mas nem isso dá pé...'" },
+            { number: 33, question: "<b>Pergunta:</b> Qual frase apresenta uma opinião?", answer: "R: 'É um passeio superlegal,...'" },
+            { number: 34, question: "<b>Frase:</b> No trecho '... que consiga viver <b>ali dentro</b>.', a palavra destacada indica:", answer: "R: Lugar." }
+        ];
+
+        const questionMap = new Map(bingoData.map(item => [item.number, item]));
+        let availableNumbers = bingoData.map(q => q.number);
+        let currentQuestion = null;
+
+        const drawBtn = document.getElementById('draw-btn');
+        const answerBtn = document.getElementById('answer-btn');
+        const questionDisplay = document.getElementById('question-display');
+        const answerDisplay = document.getElementById('answer-display');
+        const bingoBoard = document.getElementById('bingo-board');
+
+        function initializeBoard() {
+            const allNumbers = new Set(bingoData.map(q => q.number));
+            const min = 0;
+            const max = 34;
+            
+            for (let i = min; i <= max; i++) {
+                const numberCell = document.createElement('div');
+                numberCell.classList.add('board-number');
+                numberCell.textContent = i;
+                numberCell.id = `num-${i}`;
+                
+                if (!allNumbers.has(i)) {
+                    numberCell.classList.add('disabled');
+                }
+                
+                bingoBoard.appendChild(numberCell);
+            }
+        }
+
+        function drawQuestion() {
+            if (availableNumbers.length === 0) {
+                questionDisplay.innerHTML = "<h2>Fim de Jogo!</h2>Todas as questões foram sorteadas.";
+                drawBtn.disabled = true;
+                answerBtn.disabled = true;
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+            const drawnNumber = availableNumbers[randomIndex];
+            
+            availableNumbers.splice(randomIndex, 1);
+
+            currentQuestion = questionMap.get(drawnNumber);
+
+            displayQuestion(currentQuestion);
+            markNumberAsDrawn(drawnNumber);
+
+            if (availableNumbers.length === 0) {
+                 drawBtn.disabled = true;
+                 drawBtn.textContent = "Fim de Jogo";
+            }
+        }
+
+        function displayQuestion(questionObj) {
+            questionDisplay.innerHTML = `<h2>Número ${questionObj.number}</h2><p>${questionObj.question}</p>`;
+            answerDisplay.style.display = 'none';
+            answerDisplay.innerHTML = `<p>${questionObj.answer}</p>`;
+            answerBtn.disabled = false;
+            // Pede ao MathJax para renderizar as novas fórmulas
+            MathJax.typeset();
+        }
+
+        function showAnswer() {
+            answerDisplay.style.display = 'block';
+            answerBtn.disabled = true;
+        }
+
+        function markNumberAsDrawn(number) {
+            const numberCell = document.getElementById(`num-${number}`);
+            if (numberCell && !numberCell.classList.contains('drawn')) {
+                numberCell.classList.add('drawn');
+                numberCell.addEventListener('click', () => viewQuestion(number));
+            }
+        }
+        
+        function viewQuestion(number) {
+            const questionObj = questionMap.get(number);
+            displayQuestion(questionObj);
+            showAnswer(); 
+        }
+
+        drawBtn.addEventListener('click', drawQuestion);
+        answerBtn.addEventListener('click', showAnswer);
+
+        initializeBoard();
+    </script>
+
+</body>
+</html>
