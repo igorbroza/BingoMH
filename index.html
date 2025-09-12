@@ -18,6 +18,7 @@
             padding: 20px;
             gap: 20px;
             flex-wrap: wrap;
+            transition: background-color 0.3s, color 0.3s;
         }
         #main-container {
             display: flex;
@@ -39,6 +40,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         #question-display, #answer-display {
             font-size: 2.5em;
@@ -47,7 +49,6 @@
         }
         #answer-display {
             color: #2e8b57;
-            font-weight: bold;
         }
         .buttons {
             margin-top: 20px;
@@ -85,6 +86,7 @@
             background-color: #e6e6fa;
             padding: 15px;
             border-radius: 10px;
+            transition: background-color 0.3s;
         }
         .board-number {
             width: 50px;
@@ -97,6 +99,7 @@
             border-radius: 5px;
             font-size: 1.2em;
             font-weight: bold;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         .drawn {
             background-color: #ffd700;
@@ -114,6 +117,56 @@
         h1, h2 {
             color: #4682b4;
             text-align: center;
+            transition: color 0.3s;
+        }
+        
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode #question-container {
+            background-color: #1e1e1e;
+            border-color: #bb86fc;
+        }
+        .dark-mode #answer-display {
+            color: #03dac6;
+        }
+        .dark-mode button {
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #bb86fc;
+        }
+         .dark-mode button#dark-mode-btn {
+            background-color: #bb86fc;
+            color: #121212;
+            border: none;
+        }
+        .dark-mode button:hover {
+            background-color: #444;
+        }
+        .dark-mode button:disabled {
+            background-color: #2a2a2a;
+            color: #555;
+            border-color: #444;
+        }
+        .dark-mode #bingo-board {
+            background-color: #2a2a2a;
+        }
+        .dark-mode .board-number {
+            background-color: #1e1e1e;
+            border-color: #444;
+        }
+        .dark-mode .drawn {
+            background-color: #bb86fc;
+            color: #121212;
+            border-color: #3700b3;
+        }
+        .dark-mode .disabled {
+            background-color: #222;
+            color: #444;
+        }
+        .dark-mode h1, .dark-mode h2 {
+            color: #bb86fc;
         }
     </style>
 </head>
@@ -124,6 +177,7 @@
         <div class="buttons">
             <button id="draw-btn">Sortear Questão</button>
             <button id="answer-btn" disabled>Mostrar Resposta</button>
+            <button id="dark-mode-btn">Alternar Modo</button>
         </div>
         <div id="question-container">
             <div id="question-display">Clique em "Sortear Questão" para começar!</div>
@@ -138,7 +192,6 @@
 
     <script>
         const bingoData = [
-            // Novas questões do arquivo SAEB QUESTÕES DO BINGO.pdf
             { number: 0, question: "<b>Pergunta:</b>Qual o resultado da expressão? <br> $$(x+\\sqrt{81}+5^{2})^{0}-1$$", answer: "R: 0 (Qualquer número elevado a zero é 1. Então, 1 - 1 = 0)" },
             { number: 1, question: "<b>Pergunta:</b>Dado o número racional 2,981, qual algarismo está na casa do milésimo?", answer: "R: 1" },
             { number: 2, question: "<b>Pergunta:</b>Qual o resultado da expressão? <br> $$\\frac{(\\frac{1}{2})^{-3}}{4}$$", answer: "R: 2 (O expoente negativo inverte a fração, então (2/1)³ = 8. E 8 / 4 = 2)" },
@@ -149,8 +202,6 @@
             { number: 7, question: "<b>Pergunta:</b>Pela manhã, a temperatura na cidade de Saeblândia era de -5°C. No início da tarde, houve um aumento de 12°C. Qual foi a temperatura da cidade após essa elevação?", answer: "R: 7°C" },
             { number: 8, question: "<b>Pergunta:</b>Qual a área do triângulo a seguir? <br> (<b>Imagem:</b> um triângulo retângulo com base medindo 4 cm e altura medindo 4 cm)", answer: "R: 8 cm² (Área = (base x altura) / 2)" },
             { number: 9, question: "<b>Pergunta:</b>Qual a área de um quadrado com lado igual  a 3?", answer: "R: 9 cm (A = 3 x)" },
-            
-            // Questões do Documento sem título.pdf
             { number: 10, question: "<b>Pergunta:</b>Uma caixa mede 2 m de comprimento, 5m de largura e 1 m de altura. Qual é o volume dessa caixa?", answer: "R: 10 metros cúbicos" },
             { number: 11, question: "<b>Pergunta:</b>Qual o PERÍMETRO de um quadrilátero que tem como medidas 5cm, 2cm, 3cm e 1 cm?", answer: "R: 11 cm" },
             { number: 12, question: "<b>Pergunta:</b>Um aquário mede 2 cm de comprimento, 2cm de largura e 3 cm de altura. Qual é o volume do aquário em cm³?", answer: "R: 12 centímetros cúbicos" },
@@ -166,8 +217,6 @@
             { number: 22, question: "<b>Pergunta:</b>Uma sala de aula tem 66 carteiras que precisam ser organizadas em 3 fileiras iguais. Quantas carteiras ficarão em cada fileira?", answer: "R: 22 carteiras" },
             { number: 23, question: "<b>Pergunta:</b>Em uma escola, os 69 alunos do 9º ano foram divididos igualmente em 3 turmas. Quantos alunos ficaram em cada turma?", answer: "R: 23 alunos" },
             { number: 24, question: "<b>Pergunta:</b>Um produto custa 30 reais e recebe um desconto de 20%. Qual é o valor a pagar?", answer: "R: 24 reais" },
-
-            // Questões do QUESTÕES PARA BINGO (1).pdf
             { number: 25, question: "<b>Texto:</b> 'Diego não conhecia o mar... E foi tanta a imensidão do mar, e tanto fulgor, que o menino ficou mudo de beleza. E quando finalmente conseguiu falar, tremendo, gaguejando, pediu ao pai: Me ajuda a olhar!'<br><br><b>Pergunta:</b> O menino ficou tremendo, gaguejando por quê?<br><br><b>Alternativas:</b> <br> (02) a viagem foi longa. <br> (06) as dunas eram muito altas. <br> (25) o mar era imenso e belo. <br> (22) o pai não o ajudou a ver o mar.", answer: "R:(25) O mar era imenso e belo." },
             { number: 26, question: "<b>Texto:</b> '...um mar sombrio, cheio de peixosos peixes queixosos e pesarosos, tão horríveis de se comer que faziam as pessoas arrotarem de pura melancolia...'<br><br><b>Pergunta:</b> O trecho do texto que indica uma consequência é: <br><br><b>Alternativas:</b> <br> (01) “uma triste cidade, a mais triste das cidades”. <br> (13) “Ficava à margem de um mar sombrio, cheio de peixosos “. <br> (26) “que faziam as pessoas arrotarem de pura melancolia”. <br> (30) ”Ao norte dessa cidade triste havia poderosas fábricas”. ", answer: "R:(26) '...que faziam as pessoas arrotarem de pura melancolia'." },
             { number: 27, question: "<b>Texto:</b> 'O galo e as galinhas viram de longe uma raposa que chegava. Empoleiraram-se na árvore mais próxima para escapar da inimiga.'<br><br><b>Pergunta:</b> O galo e as galinhas subiram na árvore por quê? <br><br><b>Alternativas:</b> <br> (20) gostam de ficar empoleirados. <br> (27) queriam escapar da raposa. <br> (40) seus amigos estavam lá em cima. <br> (03) um cachorro vinha na direção deles.", answer: "R:(27) Queriam escapar da raposa." },
@@ -195,6 +244,14 @@
         const questionDisplay = document.getElementById('question-display');
         const answerDisplay = document.getElementById('answer-display');
         const bingoBoard = document.getElementById('bingo-board');
+        
+        const darkModeBtn = document.getElementById('dark-mode-btn');
+        const body = document.body;
+
+        darkModeBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+        });
+        
 
         function initializeBoard() {
             const allNumbers = new Set(bingoData.map(q => q.number));
@@ -244,7 +301,6 @@
             answerDisplay.style.display = 'none';
             answerDisplay.innerHTML = `<p>${questionObj.answer}</p>`;
             answerBtn.disabled = false;
-            // Pede ao MathJax para renderizar as novas fórmulas
             MathJax.typeset();
         }
 
