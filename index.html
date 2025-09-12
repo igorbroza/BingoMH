@@ -148,6 +148,7 @@
             { number: 6, question: "<b>Pergunta:</b>Qual o valor de x na expressão? <br> $$\\frac{x}{3}=\\frac{18}{9}$$", answer: "R: 6 (Como 18/9 = 2, temos x/3 = 2. Portanto, x = 6)" },
             { number: 7, question: "<b>Pergunta:</b>Pela manhã, a temperatura na cidade de Saeblândia era de -5°C. No início da tarde, houve um aumento de 12°C. Qual foi a temperatura da cidade após essa elevação?", answer: "R: 7°C" },
             { number: 8, question: "<b>Pergunta:</b>Qual a área do triângulo a seguir? <br> (<b>Imagem:</b> um triângulo retângulo com base medindo 4 cm e altura medindo 4 cm)", answer: "R: 8 cm² (Área = (base x altura) / 2)" },
+            { number: 9, question: "<b>Pergunta:</b>Qual a área de um quadrado com lado igual  a 3?", answer: "R: 9 cm (A = 3 x)" },
             
             // Questões do Documento sem título.pdf
             { number: 10, question: "<b>Pergunta:</b>Uma caixa mede 2 m de comprimento, 5m de largura e 1 m de altura. Qual é o volume dessa caixa?", answer: "R: 10 metros cúbicos" },
@@ -176,7 +177,13 @@
             { number: 31, question: "<b>Texto:</b> 'A tecnologia brasileira está ajudando a população de Angola a identificar e desarmar milhares de minas terrestres... Uma empresa... vem dando treinamento aos angolanos para a identificação de minas por meio de imagens de satélite.'<br><br><b>Pergunta:</b> De acordo com esse texto, qual a finalidade da tecnologia brasileira em Angola? <br><br><b>Alternativas:</b> <br> (33) Desarmar os angolanos. <br> (39) Destruir imagens de satelite. <br> (04) Fazer exportações de produtos <br> (31) Identificar minas terrestres.", answer: "R:(31) Identificar minas terrestres." },
             { number: 32, question: "<b>Pergunta:</b> Qual trecho exemplifica o uso da linguagem informal, enfatizando a intimidade entre os interlocutores?<br><br><b>Alternativas:</b> <br>(05)“...meu pai e minha mãe trabalham...” <br> (07) “Não posso trazer nenhum colega aqui:” <br> (32) “...mas nem isso dá pé...” <br> (40) “POR FAVOR, sim?” ", answer: "R: (32)'...mas nem isso dá pé...'" },
             { number: 33, question: "<b>Pergunta:</b> Qual frase apresenta uma opinião? <br><br> <b>Alternativas:</b> <br> (34) “Depois das primeiras locomotivas, veio o bonde,...” <br> (06) “... o bonde foi muito comum nas principais cidades.”. <br> (33) “É um passeio superlegal,...”. <br> (30) “Em 1863, surgiu o metrô.”. ", answer: "R:(33) 'É um passeio superlegal,...'" },
-            { number: 34, question: "<b>Frase:</b> No trecho '... que consiga viver <b>ali dentro</b>.', a palavra destacada indica: <br><br> <b>Alternativas:</b> <br> (34) lugar. <br> 30) modo. <br> (22) tempo. <br> (33) intensidade.", answer: "R:(34) Lugar." }
+            { number: 34, question: "<b>Frase:</b> No trecho '... que consiga viver ali dentro.' <br><br> <b>Pergunta:</b> a palavra destacada indica: <br><br> <b>Alternativas:</b> <br> (34) lugar. <br> 30) modo. <br> (22) tempo. <br> (33) intensidade.", answer: "R:(34) Lugar." },
+            { number: 35, question: "<b>Pergunta:</b> Um losango possui diagonais iguais a 10m e 7m, Calcule a área do losango?", answer: "R:35 m² (A = (10 * 7) / 2)." },
+            { number: 36, question: "<b>Pergunta:</b> 6² é igual a?", answer: "R:36" },
+            { number: 37, question: "<b>Pergunta:</b> Calcule 33,11 + 3,89", answer: "R:37" },
+            { number: 38, question: "<b>Pergunta:</b> Calcule 2,5 x 15,2?", answer: "R:38" },
+            { number: 39, question: "<b>Pergunta:</b> Uma figura plana possui lados que medem 15cm, 10cm, 9cm e 5cm. Qual é o perímetro?", answer: "R:39cm (15 + 10 + 9 + 5)" },
+            { number: 40, question: "<b>Pergunta:</b> Calcule o perímetro de um triângulo sabendo que os seus lados medem 15cm, 9cm, e 16cm. ", answer: "R:40cm (15 + 9 + 16)" }
         ];
 
         const questionMap = new Map(bingoData.map(item => [item.number, item]));
@@ -192,7 +199,7 @@
         function initializeBoard() {
             const allNumbers = new Set(bingoData.map(q => q.number));
             const min = 0;
-            const max = 34;
+            const max = 40;
             
             for (let i = min; i <= max; i++) {
                 const numberCell = document.createElement('div');
